@@ -24,7 +24,7 @@
 
 /**
  * Binding option: value transformer key
- * Passed object should be a block of type `KHBindingValueTransformerBlock` (see below)
+ * Passed object should be a block of type `KHBindingValueTransformerBlock`
  */
 extern NSString * const KHBindingOptionValueTransformerKey;
 typedef id (^KHBindingValueTransformerBlock)(id value, BOOL isReverse);
@@ -34,6 +34,7 @@ typedef id (^KHBindingValueTransformerBlock)(id value, BOOL isReverse);
  * Used when binded value is set to `nil`. Should be any object of type `id`
  */
 extern NSString * const KHBindingOptionNullPlaceholderKey;
+
 
 /**
  * Keys used in a dictionary returned by kh_bindingsInfo
@@ -48,14 +49,14 @@ extern NSString * const KHBindingOptionsKey;
  */
 @interface NSObject (KHBinding)
 
-// Binds `self.binding` to `target.keyPath` using the options granted
+// Binds `self.binding` to `target.keyPath` using the specified options
 // For the list of available options see above
 - (void)kh_bind:(NSString *)binding toObject:(NSObject *)target withKeyPath:(NSString *)keyPath options:(NSDictionary *)options;
 
-// unregisters object from the binding
+// Unbinds the object from the specified binding
 - (void)kh_unbind:(NSString *)binding;
 
-// information about all the bindings that are registered on the object
+// Information about all the bindings that are registered on the object
 - (NSDictionary *)kh_bindingsInfo;
 
 @end
