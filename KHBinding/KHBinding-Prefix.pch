@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'KHBinding' target in the 'KHBinding' project
+//
+
+#ifdef __OBJC__
+  #import <Foundation/Foundation.h>
+#endif
