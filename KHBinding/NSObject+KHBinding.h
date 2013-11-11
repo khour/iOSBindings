@@ -22,20 +22,40 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ * Binding option: value transformer key
+ * Passed object should be a block of type `KHBindingValueTransformerBlock` (see below)
+ */
 extern NSString * const KHBindingOptionValueTransformerKey;
+typedef id (^KHBindingValueTransformerBlock)(id value, BOOL isReverse);
+
+/**
+ * Binding option: null placeholder key
+ * Used when binded value is set to `nil`. Should be any object of type `id`
+ */
 extern NSString * const KHBindingOptionNullPlaceholderKey;
 
+/**
+ * Keys used in a dictionary returned by kh_bindingsInfo
+ */
 extern NSString * const KHBindingObservedObjectKey;
 extern NSString * const KHBindingObservedKeyPathKey;
 extern NSString * const KHBindingOptionsKey;
 
-typedef id (^KHBindingValueTransformerBlock)(id value, BOOL isReverse);
 
+/**
+ * Transparent category that allows Cocoa-like in iOS Foundation
+ */
 @interface NSObject (KHBinding)
 
+// Binds `self.binding` to `target.keyPath` using the options granted
+// For the list of available options see above
 - (void)kh_bind:(NSString *)binding toObject:(NSObject *)target withKeyPath:(NSString *)keyPath options:(NSDictionary *)options;
+
+// unregisters object from the binding
 - (void)kh_unbind:(NSString *)binding;
 
+// information about all the bindings that are registered on the object
 - (NSDictionary *)kh_bindingsInfo;
 
 @end

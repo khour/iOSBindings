@@ -34,6 +34,7 @@ NSString * const KHBindingObservedObjectKey = @"KHBindingObservedObjectKey";
 NSString * const KHBindingObservedKeyPathKey = @"KHBindingObservedKeyPathKey";
 NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
 
+
 @interface __KHBindingHelper : NSObject
 
 @property (nonatomic, weak) id object;
@@ -50,16 +51,6 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
 
 
 @interface __KHBindingHelperWithStubKVO : __KHBindingHelper
-@end
-@implementation __KHBindingHelperWithStubKVO
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    // stub method to ignore a recursive `observeValueForKeyPath:ofObject:change:context:` call from below
-    // the only way codeflow gets here is from the same method of __KHBindingHelper
-    // switch isa back and unlock the mutex in here
-    object_setClass(self, [__KHBindingHelper class]);
-    [self.lock unlock];
-}
 @end
 
 
@@ -174,6 +165,21 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
 
 @end
 
+
+@implementation __KHBindingHelperWithStubKVO
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    // stub method to ignore a recursive `observeValueForKeyPath:ofObject:change:context:` call from below
+    // the only way codeflow gets here is from the same method of __KHBindingHelper
+    // switch isa back and unlock the mutex in here
+    object_setClass(self, [__KHBindingHelper class]);
+    [self.lock unlock];
+}
+
+@end
+
+
 @implementation NSObject (KHBinding)
 
 - (void)kh_bind:(NSString *)binding toObject:(id)target withKeyPath:(NSString *)keyPath options:(NSDictionary *)options
@@ -224,7 +230,6 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
     NSMutableDictionary *bindingsInfo = [NSMutableDictionary dictionaryWithCapacity:helpers.count];
     for (__KHBindingHelper *helper in helpers.allValues)
     {
-        
         NSDictionary *bindingInfo = @{ KHBindingObservedObjectKey: helper.target,
                                        KHBindingObservedKeyPathKey: helper.keyPath,
                                        KHBindingOptionsKey: [NSDictionary dictionaryWithDictionary:helper.options] };
