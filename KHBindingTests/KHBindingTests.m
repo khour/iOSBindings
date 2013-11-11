@@ -76,7 +76,7 @@ static double const kDoubleAccuracy = 0.0000001;
     };
     
     NSDictionary *options = [NSDictionary dictionaryWithObject:factor2Transformer
-                                                        forKey:KHValueTransformerBindingOption];
+                                                        forKey:KHBindingValueTransformerBindingOption];
     
     [foo kh_bind:@"foo" toObject:bar withKeyPath:@"bar" options:options];
     
