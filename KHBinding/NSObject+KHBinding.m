@@ -56,7 +56,7 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
 {
     // stub method to ignore a recursive `observeValueForKeyPath:ofObject:change:context:` call from below
     // the only way codeflow gets here is from the same method of __KHBindingHelper
-    // switch isa and unlock the mutex in here
+    // switch isa back and unlock the mutex in here
     object_setClass(self, [__KHBindingHelper class]);
     [self.lock unlock];
 }
@@ -144,7 +144,7 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
     newValue = [self processedValue:newValue usingOptions:_options reverse:!isDirect];
 
     
-    // this will trigger a recursive `observeValueForKeyPath:ofObject:change:context:` call,
+    // `setValue:forKeyPath` below will trigger a recursive `observeValueForKeyPath:ofObject:change:context:` call,
     // which will be ignored thanks to self isa switch
     // locking is here to ensure the thread-safety in this particular method
     [self.lock lock];
