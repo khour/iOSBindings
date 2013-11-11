@@ -30,6 +30,7 @@ static double const kDoubleAccuracy = 0.0000001;
 @class Bar;
 
 @interface Foo : NSObject
+@property (nonatomic, strong) Bar *bar;
 @property (nonatomic, assign) double foo;
 @end
 
@@ -72,11 +73,11 @@ static double const kDoubleAccuracy = 0.0000001;
         }
         
         double transformedValue = [value doubleValue] * (isReverse ? 0.5 : 2);
-        return (id)[NSNumber numberWithDouble:transformedValue];
+        return (id)@(transformedValue);
     };
     
-    NSDictionary *options = [NSDictionary dictionaryWithObject:factor2Transformer
-                                                        forKey:KHBindingValueTransformerBindingOption];
+    NSDictionary *options = @{ KHBindingOptionValueTransformerKey: factor2Transformer,
+                               KHBindingOptionNullPlaceholderKey: @265.0 };
     
     [foo kh_bind:@"foo" toObject:bar withKeyPath:@"bar" options:options];
     
@@ -87,6 +88,24 @@ static double const kDoubleAccuracy = 0.0000001;
     STAssertEqualsWithAccuracy(bar.bar, 21.0, kDoubleAccuracy, @"Reversely transformed 42.0 value should be 21.0");
     
     [foo kh_unbind:@"foo"];
+}
+
+- (void)testNilSetting
+{
+    Foo *foo = [Foo new];
+    foo.bar = [Bar new];
+    Bar *bar = [Bar new];
+    
+    [bar kh_bind:@"bar" toObject:foo withKeyPath:@"bar.bar" options:nil];
+    foo.bar.bar = 42;
+    
+    STAssertEqualsWithAccuracy(bar.bar, 42.0, kDoubleAccuracy, @"Binded value should be 42.0");
+    
+    // this will try to set bar.bar with boxed foo.bar.bar, which will be NSNull
+    // so expect a throw here
+    STAssertThrows(foo.bar = nil, @"");
+    
+    [bar kh_unbind:@"bar"];
 }
 
 @end

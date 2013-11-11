@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		7DFD93B61830DCBF00604E42 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DFD93B51830DCBF00604E42 /* Foundation.framework */; };
 		7DFD93C51830DCBF00604E42 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DFD93C41830DCBF00604E42 /* SenTestingKit.framework */; };
-		7DFD93C71830DCBF00604E42 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DFD93C61830DCBF00604E42 /* UIKit.framework */; };
 		7DFD93C81830DCBF00604E42 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DFD93B51830DCBF00604E42 /* Foundation.framework */; };
 		7DFD93CB1830DCBF00604E42 /* libKHBinding.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DFD93B21830DCBF00604E42 /* libKHBinding.a */; };
 		7DFD93D11830DCBF00604E42 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7DFD93CF1830DCBF00604E42 /* InfoPlist.strings */; };
@@ -43,16 +42,15 @@
 /* Begin PBXFileReference section */
 		7DFD93B21830DCBF00604E42 /* libKHBinding.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libKHBinding.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DFD93B51830DCBF00604E42 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		7DFD93B91830DCBF00604E42 /* KHBinding-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KHBinding-Prefix.pch"; sourceTree = "<group>"; };
+		7DFD93B91830DCBF00604E42 /* KHBinding-Prefix.pch */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = "KHBinding-Prefix.pch"; sourceTree = "<group>"; };
 		7DFD93C31830DCBF00604E42 /* KHBindingTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KHBindingTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DFD93C41830DCBF00604E42 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		7DFD93C61830DCBF00604E42 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		7DFD93CE1830DCBF00604E42 /* KHBindingTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "KHBindingTests-Info.plist"; sourceTree = "<group>"; };
 		7DFD93D01830DCBF00604E42 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		7DFD93D21830DCBF00604E42 /* KHBindingTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KHBindingTests.h; sourceTree = "<group>"; };
+		7DFD93D21830DCBF00604E42 /* KHBindingTests.h */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = KHBindingTests.h; sourceTree = "<group>"; };
 		7DFD93D31830DCBF00604E42 /* KHBindingTests.m */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = KHBindingTests.m; sourceTree = "<group>"; };
-		7DFD93DD1830DCE500604E42 /* NSObject+KHBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+KHBinding.h"; sourceTree = "<group>"; };
-		7DFD93DE1830DCE500604E42 /* NSObject+KHBinding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+KHBinding.m"; sourceTree = "<group>"; };
+		7DFD93DD1830DCE500604E42 /* NSObject+KHBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+KHBinding.h"; sourceTree = "<group>"; };
+		7DFD93DE1830DCE500604E42 /* NSObject+KHBinding.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+KHBinding.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,7 +67,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7DFD93C51830DCBF00604E42 /* SenTestingKit.framework in Frameworks */,
-				7DFD93C71830DCBF00604E42 /* UIKit.framework in Frameworks */,
 				7DFD93C81830DCBF00604E42 /* Foundation.framework in Frameworks */,
 				7DFD93CB1830DCBF00604E42 /* libKHBinding.a in Frameworks */,
 			);
@@ -102,7 +99,6 @@
 			children = (
 				7DFD93B51830DCBF00604E42 /* Foundation.framework */,
 				7DFD93C41830DCBF00604E42 /* SenTestingKit.framework */,
-				7DFD93C61830DCBF00604E42 /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

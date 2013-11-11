@@ -22,7 +22,8 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString * const KHBindingValueTransformerBindingOption;
+extern NSString * const KHBindingOptionValueTransformerKey;
+extern NSString * const KHBindingOptionNullPlaceholderKey;
 
 extern NSString * const KHBindingObservedObjectKey;
 extern NSString * const KHBindingObservedKeyPathKey;
