@@ -27,24 +27,27 @@ static void * const __KHBindingHelperContextDirect = (void *)&__KHBindingHelperC
 static void * const __KHBindingHelperContextReverse = (void *)&__KHBindingHelperContextReverse;
 static void * const __KHBindingDictionaryKey = (void *)&__KHBindingDictionaryKey;
 
-NSString * const KHValueTransformerBindingOption = @"KHValueTransformerBindingOption";
+NSString * const KHBindingValueTransformerBindingOption = @"KHValueTransformerBindingOption";
+
+NSString * const KHBindingObservedObjectKey = @"KHBindingObservedObjectKey";
+NSString * const KHBindingObservedKeyPathKey = @"KHBindingObservedKeyPathKey";
+NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
 
 @interface __KHBindingHelper : NSObject
-{
-    id _object;
-    NSString *_binding;
-    id _target;
-    NSString *_keyPath;
-    NSDictionary *_options;
-}
+
+@property (nonatomic, weak) id object;
+@property (nonatomic, strong) NSString *binding;
+@property (nonatomic, weak) id target;
+@property (nonatomic, strong) NSString *keyPath;
+@property (nonatomic, strong) NSDictionary *options;
 
 - (id)initWithObject:(id)object binding:(NSString *)binding target:(id)target keyPath:(id)keyPath options:(NSDictionary *)options;
 
 @end
 
+
 @interface __KHBindingHelperWithStubKVO : __KHBindingHelper
 @end
-
 @implementation __KHBindingHelperWithStubKVO
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
@@ -53,6 +56,7 @@ NSString * const KHValueTransformerBindingOption = @"KHValueTransformerBindingOp
     NSAssert([self class] == [__KHBindingHelperWithStubKVO class], @"Unexpected class %@ instead of %@, \nBacktrace:\n%@", [self class], [__KHBindingHelper class], [NSThread callStackSymbols]);
 }
 @end
+
 
 @implementation __KHBindingHelper
 
@@ -77,7 +81,7 @@ NSString * const KHValueTransformerBindingOption = @"KHValueTransformerBindingOp
 {
     // TODO: implement other options
     
-    KHBindingValueTransformerBlock transformer = [options objectForKey:KHValueTransformerBindingOption];
+    KHBindingValueTransformerBlock transformer = [options objectForKey:KHBindingValueTransformerBindingOption];
     if (transformer)
     {
         value = transformer(value, isReverse);
@@ -99,7 +103,7 @@ NSString * const KHValueTransformerBindingOption = @"KHValueTransformerBindingOp
     BOOL isDirect = (context == __KHBindingHelperContextDirect);
     id destinationObject = (isDirect) ? _object : _target;
     NSString *destinationKeyPath = (isDirect) ? _binding : _keyPath;
-
+    
     // retrieve new value and apply rules specified in `options` to it
     id newValue = [change objectForKey:NSKeyValueChangeNewKey];
     newValue = [self processedValue:newValue usingOptions:_options reverse:!isDirect];
@@ -171,6 +175,24 @@ NSString * const KHValueTransformerBindingOption = @"KHValueTransformerBindingOp
         
         [helpers removeObjectForKey:binding];
     }
+}
+
+- (NSDictionary *)kh_bindingsInfo
+{
+    NSMutableDictionary *helpers = objc_getAssociatedObject(self, __KHBindingDictionaryKey);
+    NSMutableDictionary *bindingsInfo = [NSMutableDictionary dictionaryWithCapacity:helpers.count];
+    for (__KHBindingHelper *helper in helpers.allValues)
+    {
+        NSDictionary *bindingInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     helper.target, KHBindingObservedObjectKey,
+                                     helper.keyPath, KHBindingObservedKeyPathKey,
+                                     [NSDictionary dictionaryWithDictionary:helper.options], KHBindingOptionsKey,
+                                     nil];
+        
+        [bindingsInfo setObject:bindingInfo forKey:helper.binding];
+    }
+    
+    return bindingsInfo;
 }
 
 @end

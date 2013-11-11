@@ -22,7 +22,11 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString * const KHValueTransformerBindingOption;
+extern NSString * const KHBindingValueTransformerBindingOption;
+
+extern NSString * const KHBindingObservedObjectKey;
+extern NSString * const KHBindingObservedKeyPathKey;
+extern NSString * const KHBindingOptionsKey;
 
 typedef id (^KHBindingValueTransformerBlock)(id value, BOOL isReverse);
 
@@ -30,5 +34,7 @@ typedef id (^KHBindingValueTransformerBlock)(id value, BOOL isReverse);
 
 - (void)kh_bind:(NSString *)binding toObject:(NSObject *)target withKeyPath:(NSString *)keyPath options:(NSDictionary *)options;
 - (void)kh_unbind:(NSString *)binding;
+
+- (NSDictionary *)kh_bindingsInfo;
 
 @end
