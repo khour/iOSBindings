@@ -108,4 +108,37 @@ static double const kDoubleAccuracy = 0.0000001;
     [bar kh_unbind:@"bar"];
 }
 
+- (void)testDirectWayOnlyOption
+{
+    Foo *foo = [Foo new];
+    Bar *bar = [Bar new];
+    
+    foo.foo = 1.0;
+    bar.bar = 2.0;
+    
+    NSDictionary *options = @{ KHBindingOptionDirectOnlyKey : @YES };
+    
+    [foo kh_bind:@"foo" toObject:bar withKeyPath:@"bar" options:options];
+    
+    bar.bar = 42.0;
+    STAssertEqualsWithAccuracy(foo.foo, 42.0, kDoubleAccuracy, @"Binded value should be 42.0");
+    
+    foo.foo = 265.0;
+    STAssertEqualsWithAccuracy(bar.bar, 42.0, kDoubleAccuracy, @"One-way binded value of the source should be unchanged 42.0");
+    
+    [foo kh_unbind:@"foo"];
+    
+    options = @{ KHBindingOptionDirectOnlyKey : @NO };
+    
+    [foo kh_bind:@"foo" toObject:bar withKeyPath:@"bar" options:options];
+    
+    bar.bar = 42.0;
+    STAssertEqualsWithAccuracy(foo.foo, 42.0, kDoubleAccuracy, @"Binded value should be 42.0");
+    
+    foo.foo = 265.0;
+    STAssertEqualsWithAccuracy(bar.bar, 265.0, kDoubleAccuracy, @"Binded value should be 265.0");
+    
+    [foo kh_unbind:@"foo"];
+}
+
 @end

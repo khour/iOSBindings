@@ -35,6 +35,14 @@ typedef id (^KHBindingValueTransformerBlock)(id value, BOOL isReverse);
  */
 extern NSString * const KHBindingOptionNullPlaceholderKey;
 
+/**
+ * Binding option: direct only
+ * Used to specify that the binding works only in direct way (source -> target)
+ * Should be a NSNumber constucted from BOOL
+ * When no specified or specified with NO then binding is bidirectional
+ */
+extern NSString * const KHBindingOptionDirectOnlyKey;
+
 
 /**
  * Keys used in a dictionary returned by kh_bindingsInfo
@@ -45,7 +53,7 @@ extern NSString * const KHBindingOptionsKey;
 
 
 /**
- * Transparent category that allows Cocoa-like in iOS Foundation
+ * Transparent category that allows Cocoa-like bindings for iOS Foundation
  */
 @interface NSObject (KHBinding)
 

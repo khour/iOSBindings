@@ -29,6 +29,7 @@ static void * const __KHBindingDictionaryKey = (void *)&__KHBindingDictionaryKey
 
 NSString * const KHBindingOptionValueTransformerKey = @"KHBindingOptionValueTransformerKey";
 NSString * const KHBindingOptionNullPlaceholderKey = @"KHBindingOptionNullPlaceholderKey";
+NSString * const KHBindingOptionDirectOnlyKey = @"KHBindingOptionDirectOnlyKey";
 
 NSString * const KHBindingObservedObjectKey = @"KHBindingObservedObjectKey";
 NSString * const KHBindingObservedKeyPathKey = @"KHBindingObservedKeyPathKey";
@@ -119,6 +120,13 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
     {
         // not gonna happen, but a bit of safecoding won't hurt
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+    
+    // do not continue if binding does not allow reverse way
+    BOOL directOnly = [_options[KHBindingOptionDirectOnlyKey] boolValue];
+    if (directOnly && context == __KHBindingHelperContextReverse)
+    {
         return;
     }
     
