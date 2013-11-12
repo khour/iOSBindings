@@ -66,13 +66,13 @@ static double const kDoubleAccuracy = 0.0000001;
     Foo *foo = [Foo new];
     Bar *bar = [Bar new];
     
-    KHBindingValueTransformerBlock factor2Transformer = (id)^(id value, BOOL isReverse) {
+    KHBindingValueTransformerBlock factor2Transformer = (id)^(id value, BOOL isDirect) {
         if(![value isKindOfClass:[NSNumber class]])
         {
             return value;
         }
         
-        double transformedValue = [value doubleValue] * (isReverse ? 0.5 : 2);
+        double transformedValue = [value doubleValue] * (isDirect ? 2 : 0.5);
         return (id)@(transformedValue);
     };
     

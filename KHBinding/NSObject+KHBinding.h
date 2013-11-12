@@ -27,7 +27,7 @@
  * Passed object should be a block of type `KHBindingValueTransformerBlock`
  */
 extern NSString * const KHBindingOptionValueTransformerKey;
-typedef id (^KHBindingValueTransformerBlock)(id value, BOOL isReverse);
+typedef id (^KHBindingValueTransformerBlock)(id value, BOOL isDirect);
 
 /**
  * Binding option: null placeholder key

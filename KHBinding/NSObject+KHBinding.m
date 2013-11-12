@@ -37,16 +37,18 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
 
 
 @interface __KHBindingHelper : NSObject
-
-@property (nonatomic, weak) id object;
-@property (nonatomic, strong) NSString *binding;
-@property (nonatomic, weak) id target;
-@property (nonatomic, strong) NSString *keyPath;
-@property (nonatomic, strong) NSDictionary *options;
-@property (atomic, strong) NSLock *lock;
-@property (nonatomic, assign) BOOL isRegisteredAsObserver;
+{
+    id _object;
+    NSString *_binding;
+    id _target;
+    NSString *_keyPath;
+    NSDictionary *_options;
+    NSLock *_lock;
+    BOOL _isRegisteredAsObserver;
+}
 
 - (id)initWithObject:(id)object binding:(NSString *)binding target:(id)target keyPath:(id)keyPath options:(NSDictionary *)options;
+- (NSDictionary *)bindingInfo;
 
 @end
 
@@ -72,24 +74,32 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
     return self;
 }
 
+- (NSDictionary *)bindingInfo
+{
+    NSDictionary *bindingInfo = @{ KHBindingObservedObjectKey: _target,
+                                   KHBindingObservedKeyPathKey: _keyPath,
+                                   KHBindingOptionsKey: [NSDictionary dictionaryWithDictionary:_options] };
+    return bindingInfo;
+}
+
 - (void)registerObservers
 {
-    NSAssert(!self.isRegisteredAsObserver, @"Trying to register observer which is already registered\nBacktrace:\n%@", [NSThread callStackSymbols]);
+    NSAssert(!_isRegisteredAsObserver, @"Trying to register observer which is already registered\nBacktrace:\n%@", [NSThread callStackSymbols]);
     [_target addObserver:self forKeyPath:_keyPath options:NSKeyValueObservingOptionNew context:__KHBindingHelperContextDirect];
     [_object addObserver:self forKeyPath:_binding options:NSKeyValueObservingOptionNew context:__KHBindingHelperContextReverse];
-    self.isRegisteredAsObserver = YES;
+    _isRegisteredAsObserver = YES;
 }
 
 - (void)unregisterObservers
 {
-    NSAssert(self.isRegisteredAsObserver, @"Trying to unregister observer which is already unregistered\nBacktrace:\n%@", [NSThread callStackSymbols]);
+    NSAssert(_isRegisteredAsObserver, @"Trying to unregister observer which is already unregistered\nBacktrace:\n%@", [NSThread callStackSymbols]);
     [_target removeObserver:self forKeyPath:_keyPath context:__KHBindingHelperContextDirect];
     [_object removeObserver:self forKeyPath:_binding context:__KHBindingHelperContextReverse];
-    self.isRegisteredAsObserver = NO;
+    _isRegisteredAsObserver = NO;
 }
 
 // TODO: implement other options
-- (id)processedValue:(id)value usingOptions:(NSDictionary *)options reverse:(BOOL)isReverse
+- (id)processedValue:(id)value usingOptions:(NSDictionary *)options direct:(BOOL)isDirect
 {
     if (value == [NSNull null])
     {
@@ -108,7 +118,7 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
     KHBindingValueTransformerBlock transformer = options[KHBindingOptionValueTransformerKey];
     if (transformer)
     {
-        value = transformer(value, isReverse);
+        value = transformer(value, isDirect);
     }
     
     return value;
@@ -122,6 +132,7 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         return;
     }
+    
     
     // do not continue if binding does not allow reverse way
     BOOL directOnly = [_options[KHBindingOptionDirectOnlyKey] boolValue];
@@ -140,13 +151,13 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
     
     // retrieve new value and apply rules specified in `options` to it
     id newValue = change[NSKeyValueChangeNewKey];
-    newValue = [self processedValue:newValue usingOptions:_options reverse:!isDirect];
+    newValue = [self processedValue:newValue usingOptions:_options direct:isDirect];
 
     
     // `setValue:forKeyPath` below will trigger a recursive `observeValueForKeyPath:ofObject:change:context:` call,
     // which will be ignored thanks to self isa switch
-    // locking is here to ensure the thread-safety in this particular method
-    [self.lock lock];
+    // mutex is here to ensure the thread-safety in this particular method
+    [_lock lock];
     
     object_setClass(self, [__KHBindingHelperWithStubKVO class]);
     @try
@@ -159,7 +170,7 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
         // if it didn't, switch isa back and unlock the mutex
         // and even if it did, these two operations won't do any harm
         object_setClass(self, [__KHBindingHelper class]);
-        [self.lock unlock];
+        [_lock unlock];
 
         // re-raise the exception with a bit of backtrace eyecandy
         [NSException raise:exception.name format:@"%@\nBacktrace:\n%@", exception.reason, [NSThread callStackSymbols]];
@@ -168,7 +179,7 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
 
 - (void)dealloc
 {
-    NSAssert(!self.isRegisteredAsObserver, @"Trying to destroy a binding helper without unregistering it as an observer\nBacktrace:\n%@", [NSThread callStackSymbols]);
+    NSAssert(!_isRegisteredAsObserver, @"Trying to destroy a binding helper without unregistering it as an observer\nBacktrace:\n%@", [NSThread callStackSymbols]);
 }
 
 @end
@@ -180,9 +191,9 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
 {
     // stub method to ignore a recursive `observeValueForKeyPath:ofObject:change:context:` call from below
     // the only way codeflow gets here is from the same method of __KHBindingHelper
-    // switch isa back and unlock the mutex in here
+    // switching isa back and unlocking the mutex is essential
     object_setClass(self, [__KHBindingHelper class]);
-    [self.lock unlock];
+    [_lock unlock];
 }
 
 @end
@@ -236,15 +247,14 @@ NSString * const KHBindingOptionsKey = @"KHBindingOptionsKey";
 {
     NSMutableDictionary *helpers = objc_getAssociatedObject(self, __KHBindingDictionaryKey);
     NSMutableDictionary *bindingsInfo = [NSMutableDictionary dictionaryWithCapacity:helpers.count];
-    for (__KHBindingHelper *helper in helpers.allValues)
-    {
-        NSDictionary *bindingInfo = @{ KHBindingObservedObjectKey: helper.target,
-                                       KHBindingObservedKeyPathKey: helper.keyPath,
-                                       KHBindingOptionsKey: [NSDictionary dictionaryWithDictionary:helper.options] };
-        
-        bindingsInfo[helper.binding] = bindingInfo;
-    }
     
+    for (NSString *binding in helpers.allKeys)
+    {
+        __KHBindingHelper *helper = helpers[binding];
+        NSDictionary *bindingInfo = [helper bindingInfo];
+        bindingsInfo[binding] = bindingInfo;
+    }
+
     return bindingsInfo;
 }
 
